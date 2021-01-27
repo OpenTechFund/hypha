@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django_tables2.utils import A
 from wagtail.core.models import Page
 
-from hypha.apply.categories.models import MetaTerm
+from hypha.apply.categories.models import Category, MetaTerm, Option
 from hypha.apply.review.models import Review
 from hypha.apply.users.groups import STAFF_GROUP_NAME
 from hypha.apply.utils.image import generate_image_tag
@@ -204,6 +204,10 @@ def get_screening_statuses(request):
         id__in=ApplicationSubmission.objects.all().values('screening_statuses__id').distinct('screening_statuses__id'))
 
 
+def get_categories(request):
+    return Category.objects.filter(filter_on_dashboard=True)
+
+
 def get_meta_terms(request):
     return MetaTerm.objects.filter(
         filter_on_dashboard=True,
@@ -262,8 +266,9 @@ class SubmissionFilter(filters.FilterSet):
     lead = Select2ModelMultipleChoiceFilter(queryset=get_round_leads, label='Leads')
     reviewers = Select2ModelMultipleChoiceFilter(queryset=get_reviewers, label='Reviewers')
     screening_statuses = Select2ModelMultipleChoiceFilter(queryset=get_screening_statuses, label='Screening', null_label='No Status')
+    form_data = Select2ModelMultipleChoiceFilter(queryset=get_categories, label='Categories')
     meta_terms = Select2ModelMultipleChoiceFilter(queryset=get_meta_terms, label='Terms')
-    per_page = filters.ChoiceFilter(choices=PAGE_CHOICES, empty_label=_('Items per page'), label='Per page', method='per_page_handler')
+    per_page = filters.ChoiceFilter(choices=PAGE_CHOICES, empty_label=_('Items'), label='Items per page', method='per_page_handler')
 
     class Meta:
         model = ApplicationSubmission
